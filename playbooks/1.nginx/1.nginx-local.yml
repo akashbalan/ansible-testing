@@ -6,7 +6,7 @@
   become_user: root
   #serial: 1
   vars:
-    AWS_ACCOUNT: "211125710812"
+    AWS_ACCOUNT: "783198837114" #take from console
   tasks:
     - name: Print Variable
       debug:
@@ -20,22 +20,22 @@
     - name: Perform apt update & Install basic packages
       shell: apt update && apt install -y unzip jq net-tools stress
       when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_version'] == "24.04")
-      timeout: 30
+      timeout: 30 #“Wait only up to 30 seconds for this task to succeed.”
       tags:
-        - tools
+        - tools #This is used to label the task 
 
     - name: Install Nginx Webserver Application
       apt:
-        name: nginx
-        state: latest
+        name: nginx #equivalnt to - sudo apt update && sudo apt install -y nginx
+        state: latest #Ensures the latest version of the package is installed
         update_cache: yes
       when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_version'] == "24.04")
       timeout: 30
 
     - name: Start Nginx Service
       service:
-        name: nginx
-        state: started
+        name: nginx # equivalent to - sudo systemctl start nginx
+        state: started #So in your case, state: started ensures Nginx is running after the playbook runs.
       when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_version'] == "24.04")
   tags:
     - nginx
@@ -47,15 +47,15 @@
   tasks:
     - name: Copy html file
       copy:
-        src: /tmp/nginxfiles/index.html
-        dest: /var/www/html/index.nginx-debian.html
-        owner: root
+        src: /tmp/nginxfiles/index.html #Path on the Ansible controller (the machine running the playbook).
+        dest: /var/www/html/index.nginx-debian.html # Path on the target/client server (the remote server you’re managing). -------------# this is the place where the server looks to serve the file when the client requests for a file/website 
+        owner: root #These set the file ownership on the client server, not the controller. So root here means the file will belong to the root user on the target machine.
         group: root
         mode: "0644"
       when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_version'] == "24.04")
 
-    - name: Copy scorekeeper.js file
-      copy:
+    - name: Copy scorekeeper.js file #If you're copying a file from one location to another on the same client machine then use  - shell: cp /etc/nginx/nginx.conf /tmp/nginx.conf.bak
+      copy: #The copy module is for copying from the Ansible controller to the client
         src: /tmp/nginxfiles/scorekeeper.js
         dest: /var/www/html/scorekeeper.js
         owner: root
