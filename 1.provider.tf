@@ -12,7 +12,7 @@ terraform {
   }
   backend "s3" {
     bucket         = "ans-buc"
-    key            = "Ansible.tfstate"
+    key            = "ansible.tfstate"
     region         = "us-east-1"
     # dynamodb_table = "-terraform-locks"
     encrypt        = true
